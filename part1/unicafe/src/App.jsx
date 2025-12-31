@@ -14,6 +14,8 @@ const App = () => {
   const [neutral, setNeutral] = useState(0);
   const [bad, setBad] = useState(0);
 
+  const all = good + bad + neutral;
+
   return (
     <div>
       <h1>give feedback</h1>
@@ -21,15 +23,18 @@ const App = () => {
       <button onClick={() => setNeutral(neutral + 1)}>neutral</button>
       <button onClick={() => setBad(bad + 1)}>bad</button>
       <h1>statistics</h1>
-      <Statistics name={"good"} value={good} />
-      <Statistics name={"neutral"} value={neutral} />
-      <Statistics name={"bad"} value={bad} />
-      <Statistics name={"all"} value={good + neutral + bad} />
-      <Statistics name={"average"} value={(good + neutral + bad) / 3} />
-      <Statistics
-        name={"positive"}
-        value={`${(good / (good + neutral + bad)) * 100}%`}
-      />
+      {all > 0 ? (
+        <>
+          <Statistics name={"good"} value={good} />
+          <Statistics name={"neutral"} value={neutral} />
+          <Statistics name={"bad"} value={bad} />
+          <Statistics name={"all"} value={all} />
+          <Statistics name={"average"} value={all / 3} />
+          <Statistics name={"positive"} value={`${(good / all) * 100}%`} />
+        </>
+      ) : (
+        <p>No feedback given</p>
+      )}
     </div>
   );
 };
