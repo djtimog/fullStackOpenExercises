@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Filter, PersonForm, Persons } from "./_component";
 
 const App = () => {
   const [persons, setPersons] = useState([
@@ -56,34 +57,28 @@ const App = () => {
       person.name.toLowerCase().includes(search.toLowerCase())
     );
     setSearchPersons(filteredPersons);
-    setSearch("");
   };
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <form onSubmit={handleSearch}>
-        filter shown with <input value={search} onChange={handleSearchChange} />
-      </form>
+      <Filter
+        handleSearch={handleSearch}
+        handleSearchChange={handleSearchChange}
+        search={search}
+      />
 
-      <h2>add a new</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          name: <input value={newName} onChange={handleNameChange} />
-        </div>
-        <div>
-          number: <input value={newNumber} onChange={handleNumberChange} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
-      <h2>Numbers</h2>
-      {personsToShow.map((person) => (
-        <p key={person.id}>
-          {person.name} {person.number}
-        </p>
-      ))}
+      <h3>Add a new</h3>
+      <PersonForm
+        handleSubmit={handleSubmit}
+        handleNameChange={handleNameChange}
+        handleNumberChange={handleNumberChange}
+        newName={newName}
+        newNumber={newNumber}
+      />
+
+      <h3>Numbers</h3>
+      <Persons personsToShow={personsToShow} />
     </div>
   );
 };
