@@ -10,10 +10,13 @@ const App = () => {
   const [searchPersons, setSearchPersons] = useState([]);
 
   useEffect(() => {
-    person.getAll().then((response) => {
-      const data = response.data;
-      setPersons(data);
-    });
+    person
+      .getAll()
+      .then((response) => {
+        const data = response.data;
+        setPersons(data);
+      })
+      .catch((error) => console.log(error));
   }, []);
 
   const handleNameChange = (event) => {
@@ -40,19 +43,42 @@ const App = () => {
     persons.forEach((person) => {
       if (person.name === newName) {
         existPerson = true;
-        alert(`${newName} is already added to phonebook`);
-        return;
       }
     });
 
     if (!existPerson) {
-      person.create(personObject).then((response) => {
-        const allPersons = persons.concat(response.data);
-        setPersons(allPersons);
-      });
-      setNewName("");
-      setNewNumber("");
+      person
+        .create(personObject)
+        .then((response) => {
+          const allPersons = persons.concat(response.data);
+          setPersons(allPersons);
+        })
+        .catch((error) => console.log(error));
+    } else {
+      if (
+        confirm(
+          `${newName} is already added to phonebook, replace the old number with a new one?`
+        )
+      ) {
+        const personToUpdate = persons.find((p) => p.name === newName);
+        const updatedPerson = { ...personToUpdate, number: newNumber };
+        person
+          .update(updatedPerson.id, updatedPerson)
+          .then((response) => {
+            setPersons(
+              persons.map((p) =>
+                p.id !== updatedPerson.id ? p : response.data
+              )
+            );
+          })
+          .catch((error) => {
+            alert(`${updatedPerson.name} has already been removed from server`);
+            setPersons(persons.filter((p) => p.id !== updatedPerson.id));
+          });
+      }
     }
+    setNewName("");
+    setNewNumber("");
   };
 
   const handleDelete = (id) => {
