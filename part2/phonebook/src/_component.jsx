@@ -4,13 +4,14 @@ const Input = ({ text, value, onChange }) => (
   </div>
 );
 
-export const Persons = ({ personsToShow }) => {
+export const Persons = ({ personsToShow, deletePerson }) => {
   return (
     <div>
       {personsToShow.map((person) => (
-        <p key={person.id}>
+        <div key={person.id}>
           {person.name} {person.number}
-        </p>
+          <button onClick={() => deletePerson(person.id)}>delete</button>
+        </div>
       ))}
     </div>
   );

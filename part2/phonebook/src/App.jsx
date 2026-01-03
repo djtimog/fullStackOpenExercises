@@ -32,7 +32,7 @@ const App = () => {
     const personObject = {
       name: newName,
       number: newNumber,
-      id: persons.length + 1,
+      id: String(persons.length + 1),
     };
 
     let existPerson = false;
@@ -52,6 +52,14 @@ const App = () => {
       });
       setNewName("");
       setNewNumber("");
+    }
+  };
+
+  const handleDelete = (id) => {
+    const personToDelete = persons.find((person) => person.id === id);
+    if (confirm(`Delete ${personToDelete.name}?`)) {
+      person.remove(id);
+      setPersons(persons.filter((person) => person.id !== id));
     }
   };
 
@@ -84,7 +92,7 @@ const App = () => {
       />
 
       <h3>Numbers</h3>
-      <Persons personsToShow={personsToShow} />
+      <Persons personsToShow={personsToShow} deletePerson={handleDelete} />
     </div>
   );
 };
