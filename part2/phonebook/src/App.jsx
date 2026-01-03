@@ -46,7 +46,12 @@ const App = () => {
     });
 
     if (!existPerson) {
-      setPersons(persons.concat(personObject));
+      axios
+        .post("http://localhost:3001/persons", personObject)
+        .then((response) => {
+          const allPersons = persons.concat(response.data);
+          setPersons(allPersons);
+        });
       setNewName("");
       setNewNumber("");
     }
