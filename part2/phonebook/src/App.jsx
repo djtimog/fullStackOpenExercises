@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Filter, PersonForm, Persons } from "./_component";
+import { Filter, Notification, PersonForm, Persons } from "./_component";
 import person from "./person";
 
 const App = () => {
@@ -8,6 +8,8 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [search, setSearch] = useState("");
   const [searchPersons, setSearchPersons] = useState([]);
+  const [notificationMessage, setNotificationMessage] = useState(null);
+  const [notificationColor, setNotificationColor] = useState("green");
 
   useEffect(() => {
     person
@@ -22,9 +24,11 @@ const App = () => {
   const handleNameChange = (event) => {
     setNewName(event.target.value);
   };
+
   const handleNumberChange = (event) => {
     setNewNumber(event.target.value);
   };
+
   const handleSearchChange = (event) => {
     setSearch(event.target.value);
   };
@@ -52,6 +56,11 @@ const App = () => {
         .then((response) => {
           const allPersons = persons.concat(response.data);
           setPersons(allPersons);
+          setNotificationMessage(`Added ${newName}`);
+          setNotificationColor("green");
+          setTimeout(() => {
+            setNotificationMessage(null);
+          }, 3000);
         })
         .catch((error) => console.log(error));
     } else {
@@ -102,6 +111,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notificationMessage} color={notificationColor} />
       <Filter
         handleSearch={handleSearch}
         handleSearchChange={handleSearchChange}

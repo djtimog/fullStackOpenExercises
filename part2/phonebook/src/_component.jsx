@@ -46,3 +46,23 @@ export const Filter = ({ handleSearch, handleSearchChange, search }) => {
     </form>
   );
 };
+
+export const Notification = ({ message, color }) => {
+  if (message === null) return null;
+
+  return (
+    <div
+      style={{
+        backgroundColor: "lightgray",
+        borderColor: color,
+        borderStyle: "solid",
+        borderWidth: "2px",
+        borderRadius: "10px",
+        padding: "0px 10px",
+        marginBottom: "10px",
+      }}
+    >
+      <h3 style={{ color: color }}>{message}</h3>
+    </div>
+  );
+};
