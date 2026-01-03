@@ -21,6 +21,14 @@ const App = () => {
       .catch((error) => console.log(error));
   }, []);
 
+  const notify = (message, color = "green", timer) => {
+    setNotificationMessage(message);
+    setNotificationColor(color);
+    setTimeout(() => {
+      setNotificationMessage(null);
+    }, timer);
+  };
+
   const handleNameChange = (event) => {
     setNewName(event.target.value);
   };
@@ -56,11 +64,7 @@ const App = () => {
         .then((response) => {
           const allPersons = persons.concat(response.data);
           setPersons(allPersons);
-          setNotificationMessage(`Added ${newName}`);
-          setNotificationColor("green");
-          setTimeout(() => {
-            setNotificationMessage(null);
-          }, 3000);
+          notify(`Added ${newName}`, "green", 3000);
         })
         .catch((error) => console.log(error));
     } else {
@@ -81,7 +85,12 @@ const App = () => {
             );
           })
           .catch((error) => {
-            alert(`${updatedPerson.name} has already been removed from server`);
+            console.log(error);
+            notify(
+              `Information of ${newName} has already been removed from server`,
+              "red",
+              3000
+            );
             setPersons(persons.filter((p) => p.id !== updatedPerson.id));
           });
       }
@@ -93,7 +102,14 @@ const App = () => {
   const handleDelete = (id) => {
     const personToDelete = persons.find((person) => person.id === id);
     if (confirm(`Delete ${personToDelete.name}?`)) {
-      person.remove(id);
+      person.remove(id).catch((error) => {
+        console.log(error);
+        notify(
+          `Information of ${newName} has already been removed from server`,
+          "red",
+          3000
+        );
+      });
       setPersons(persons.filter((person) => person.id !== id));
     }
   };
