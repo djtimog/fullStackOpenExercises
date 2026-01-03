@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Filter, PersonForm, Persons } from "./_component";
-import axios from "axios";
+import person from "./person";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -10,7 +10,7 @@ const App = () => {
   const [searchPersons, setSearchPersons] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost:3001/persons").then((response) => {
+    person.getAll().then((response) => {
       const data = response.data;
       setPersons(data);
     });
@@ -46,12 +46,10 @@ const App = () => {
     });
 
     if (!existPerson) {
-      axios
-        .post("http://localhost:3001/persons", personObject)
-        .then((response) => {
-          const allPersons = persons.concat(response.data);
-          setPersons(allPersons);
-        });
+      person.create(personObject).then((response) => {
+        const allPersons = persons.concat(response.data);
+        setPersons(allPersons);
+      });
       setNewName("");
       setNewNumber("");
     }
