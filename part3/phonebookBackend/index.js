@@ -25,6 +25,7 @@ const PORT = 3001;
 const express = require("express");
 
 const app = express();
+app.use(express.json());
 
 app.get("/api/persons", (req, res) => {
   res.json(persons);
@@ -45,6 +46,31 @@ app.get("/api/persons/:id", (req, res) => {
 
   if (!person) return res.status(404).end();
 
+  res.json(person);
+});
+
+const generateId = () => {
+  return String(Math.floor(Math.random() * 1000000000));
+};
+
+app.post("/api/persons", (req, res) => {
+  const body = req.body;
+
+  if (!body.name) {
+    return response.status(400).json({
+      error: "Name's missing",
+    });
+  }
+
+  const person = {
+    id: generateId(),
+    name: body.name,
+    number: body.number,
+  };
+
+  persons = [...persons, person];
+
+  console.log(persons);
   res.json(person);
 });
 
