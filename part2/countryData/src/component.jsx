@@ -2,6 +2,7 @@ import { useState } from "react";
 
 export const CountryBox = ({ countriesToShow }) => {
   if (!countriesToShow || countriesToShow.length === 0) return null;
+
   if (countriesToShow.length > 10) {
     return <p>Too many matches, specify another filter</p>;
   } else if (countriesToShow.length > 2) {
@@ -14,11 +15,14 @@ export const CountryBox = ({ countriesToShow }) => {
     );
   } else {
     const country = countriesToShow[0];
+
     return <CountryView country={country} />;
   }
 };
+
 const CountryList = ({ country }) => {
   const [showCountry, setShowCountry] = useState(false);
+
   return (
     <div>
       {country.name.common}

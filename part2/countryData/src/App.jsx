@@ -205,7 +205,6 @@ function App() {
       country.name.common.toLowerCase().includes(searchCountry.toLowerCase())
     );
     setCountriesToShow(searchedCoutries);
-    console.log(searchedCoutries);
   }, [searchCountry]);
 
   return (
