@@ -57,9 +57,27 @@ app.post("/api/persons", (req, res) => {
   const body = req.body;
 
   if (!body.name) {
-    return response.status(400).json({
-      error: "Name's missing",
+    return res.status(400).json({
+      error: "Name is missing",
     });
+  }
+
+  if (!body.number) {
+    return res.status(400).json({
+      error: "Number is missing",
+    });
+  }
+
+  let personExist = false;
+
+  persons.forEach((per) => {
+    if (per.name === body.name) {
+      personExist = true;
+    }
+  });
+
+  if (personExist) {
+    return res.status(400).json({ error: "name must be unique" });
   }
 
   const person = {
@@ -70,7 +88,6 @@ app.post("/api/persons", (req, res) => {
 
   persons = [...persons, person];
 
-  console.log(persons);
   res.json(person);
 });
 
