@@ -1,0 +1,29 @@
+{
+  "name": "phonebookbackend",
+  "version": "1.0.0",
+  "description": "A phonebook backend",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/djtimog/fullStackOpenExercises/part3/phonebookBackend"
+  },
+  "keywords": [
+    "Phonebook",
+    "Store",
+    "Number",
+    "Save",
+    "Number",
+    "Phone",
+    "Number"
+  ],
+  "author": "djtimog",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
