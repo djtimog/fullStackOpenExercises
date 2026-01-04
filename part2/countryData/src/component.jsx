@@ -1,4 +1,4 @@
-const CountryBox = ({ countriesToShow }) => {
+export const CountryBox = ({ countriesToShow }) => {
   if (!countriesToShow || countriesToShow.length === 0) return null;
   if (countriesToShow.length > 10) {
     return <p>Too many matches, specify another filter</p>;
