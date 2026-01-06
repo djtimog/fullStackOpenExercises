@@ -34,6 +34,8 @@ morgan.token("body", (req) => {
   return JSON.stringify(req.body);
 });
 
+app.use(express.static("dist"));
+
 app.use(
   morgan(":method :url :status :res[content-length] - :response-time ms :body")
 );
@@ -109,5 +111,6 @@ app.delete("/api/persons/:id", (req, res) => {
   res.status(204).end();
 });
 
-app.listen(PORT);
-console.log(`Server running on http://localhost:${PORT}`);
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
