@@ -1,16 +1,15 @@
-require("dotenv").config();
-const PORT = process.env.PORT;
-
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
-
 const Person = require("./models/person");
+require("dotenv").config();
 
+const PORT = process.env.PORT;
 const app = express();
-app.use(express.json());
+
 app.use(cors());
 
+app.use(express.json());
 morgan.token("body", (req) => {
   return JSON.stringify(req.body);
 });
@@ -45,12 +44,9 @@ app.get("/api/persons/:id", (req, res) => {
   res.json(person);
 });
 
-const generateId = () => {
-  return String(Math.floor(Math.random() * 1000000000));
-};
-
 app.post("/api/persons", (req, res) => {
   const body = req.body;
+  console.log(body);
 
   if (!body.name) {
     return res.status(400).json({
@@ -64,27 +60,16 @@ app.post("/api/persons", (req, res) => {
     });
   }
 
-  let personExist = false;
+  console.log(body.name, body.number);
 
-  persons.forEach((per) => {
-    if (per.name === body.name) {
-      personExist = true;
-    }
-  });
-
-  if (personExist) {
-    return res.status(400).json({ error: "name must be unique" });
-  }
-
-  const person = {
-    id: generateId(),
+  const person = new Person({
     name: body.name,
     number: body.number,
-  };
+  });
 
-  persons = [...persons, person];
-
-  res.json(person);
+  person.save().then((savedPerson) => {
+    res.json(savedPerson);
+  });
 });
 
 app.delete("/api/persons/:id", (req, res) => {
