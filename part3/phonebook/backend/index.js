@@ -67,8 +67,8 @@ app.post("/api/persons", (req, res, next) => {
   console.log(body.name, body.number);
 
   const person = new Person({
-    name: body.name,
-    number: body.number,
+    name: body.name.trim(),
+    number: body.number.trim(),
   });
 
   person
