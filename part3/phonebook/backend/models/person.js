@@ -10,7 +10,11 @@ mongoose
   .catch((error) => console.log("error message", error));
 
 const personSchema = mongoose.Schema({
-  name: String,
+  name: {
+    type: String,
+    required: true,
+    minLength: 3,
+  },
   number: String,
 });
 
