@@ -2,6 +2,7 @@ const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 const Person = require("./models/person");
+const person = require("./models/person");
 require("dotenv").config();
 
 const PORT = process.env.PORT;
@@ -27,6 +28,10 @@ app.get("/api/persons", (req, res) => {
 });
 
 app.get("/info", (req, res) => {
+  const persons = [];
+  Person.find({}).then((persons) => {
+    persons = persons;
+  });
   const cuurentDate = new Date();
   const data = `<p>Phonebook has info for ${persons.length} people</p>
   <p>${cuurentDate}</p>`;
@@ -34,14 +39,15 @@ app.get("/info", (req, res) => {
   res.send(data);
 });
 
-app.get("/api/persons/:id", (req, res) => {
+app.get("/api/persons/:id", (req, res, next) => {
   const id = req.params.id;
+  Person.findById(id)
+    .then((person) => {
+      if (!person) return res.status(404).end();
 
-  const person = persons.find((per) => per.id === id);
-
-  if (!person) return res.status(404).end();
-
-  res.json(person);
+      res.json(person);
+    })
+    .catch((error) => next(error));
 });
 
 app.post("/api/persons", (req, res) => {
@@ -72,16 +78,44 @@ app.post("/api/persons", (req, res) => {
   });
 });
 
-app.delete("/api/persons/:id", (req, res) => {
+app.put("/api/persons/:id", (req, res, next) => {
   const id = req.params.id;
-  persons = persons.filter((per) => per.id !== id);
-
-  res.status(204).end();
+  const { name, number } = req.body;
+  Person.findById(id)
+    .then((person) => {
+      if (!person) {
+        return res.status(404).end();
+      }
+      person.name = name;
+      person.number = number;
+      return person.save().then((updatedPerson) => {
+        res.json(updatedPerson);
+      });
+    })
+    .catch((error) => next(error));
 });
+
+app.delete("/api/persons/:id", (req, res, next) => {
+  const id = req.params.id;
+  Person.findByIdAndDelete(id)
+    .then((_) => {
+      res.status(204).end();
+    })
+    .catch((error) => next(error));
+});
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message);
+
+  if (error.name === "CastError") {
+    return response.status(400).send({ error: "malformatted id" });
+  }
+
+  next(error);
+};
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
-
-// 8109738931;
-// 8117081658;
