@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-require("moongoose").config();
+require("dotenv").config();
 
 const url = process.env.MONGODB_URI;
 mongoose.set("strictQuery", false);
@@ -12,6 +12,14 @@ mongoose
 const personSchema = mongoose.Schema({
   name: String,
   number: Number,
+});
+
+personSchema.set("toJSON", {
+  transform: (_, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString();
+    delete returnedObject._id;
+    delete returnedObject.__v;
+  },
 });
 
 module.exports = mongoose.model("Person", personSchema);
