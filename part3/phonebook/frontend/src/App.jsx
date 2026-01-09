@@ -47,7 +47,6 @@ const App = () => {
     const personObject = {
       name: newName,
       number: newNumber,
-      id: String(persons.length + 1),
     };
 
     let existPerson = false;

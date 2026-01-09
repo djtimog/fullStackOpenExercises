@@ -28,15 +28,13 @@ app.get("/api/persons", (req, res) => {
 });
 
 app.get("/info", (req, res) => {
-  const persons = [];
   Person.find({}).then((persons) => {
-    persons = persons;
-  });
-  const cuurentDate = new Date();
-  const data = `<p>Phonebook has info for ${persons.length} people</p>
-  <p>${cuurentDate}</p>`;
+    const cuurentDate = new Date();
+    const data = `<p>Phonebook has info for ${persons.length} people</p>
+    <p>${cuurentDate}</p>`;
 
-  res.send(data);
+    res.send(data);
+  });
 });
 
 app.get("/api/persons/:id", (req, res, next) => {
