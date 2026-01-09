@@ -65,7 +65,10 @@ const App = () => {
           setPersons(allPersons);
           notify(`Added ${newName}`, "green", 3000);
         })
-        .catch((error) => console.log(error));
+        .catch((error) => {
+          notify(error.response.data.error, "red", 3000);
+          console.log(error.message);
+        });
     } else {
       if (
         confirm(
