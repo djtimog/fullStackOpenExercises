@@ -10,7 +10,19 @@ const totalLikes = (blogs) => {
   return blogs.reduce(reducer, 0);
 };
 
+const favoriteBlog = (blogs) => {
+  if (blogs.length === 0) {
+    return null;
+  }
+
+  const likeBlog = blogs.map((blog) => blog.likes);
+  const maxLikeBlog = Math.max(...likeBlog);
+  const maxLikeBlogIndex = likeBlog.indexOf(maxLikeBlog);
+  return blogs[maxLikeBlogIndex];
+};
+
 module.exports = {
   dummy,
   totalLikes,
+  favoriteBlog,
 };
