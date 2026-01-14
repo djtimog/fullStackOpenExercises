@@ -26,6 +26,14 @@ const blogSchema = mongoose.Schema({
   likes: Number,
 });
 
+blogSchema.set("toJSON", {
+  transform: (_, returnObj) => {
+    returnObj.id = returnObj._id.toString();
+    delete returnObj._id;
+    delete returnObj.__v;
+  },
+});
+
 const Blog = mongoose.model("Blog", blogSchema);
 
 const mongoUrl = process.env.MONGODB_URI;
