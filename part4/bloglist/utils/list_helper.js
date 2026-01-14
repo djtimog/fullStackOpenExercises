@@ -20,6 +20,7 @@ const favoriteBlog = (blogs) => {
   const maxLikeBlogIndex = likeBlog.indexOf(maxLikeBlog);
   return blogs[maxLikeBlogIndex];
 };
+
 const mostBlogs = (blogs) => {
   if (blogs.length === 0) {
     return null;
@@ -44,9 +45,35 @@ const mostBlogs = (blogs) => {
   return blogCounts[maxBlogCountIndex];
 };
 
+const mostLikes = (blogs) => {
+  if (blogs.length === 0) {
+    return null;
+  }
+
+  const checkForMoreLikes = (author, blogs) => {
+    const blogsByAuthor = blogs.filter((blog) => blog.author === author);
+    return blogsByAuthor.reduce((sum, cur) => sum + cur.likes, 0);
+  };
+
+  const likeCounts = blogs.map((blog) => {
+    return {
+      author: blog.author,
+      likes: checkForMoreLikes(blog.author, blogs),
+    };
+  });
+
+  const maxLikeCount = Math.max(...likeCounts.map((count) => count.likes));
+  const maxLikeCountIndex = likeCounts.findIndex(
+    (count) => count.likes === maxLikeCount
+  );
+
+  return likeCounts[maxLikeCountIndex];
+};
+
 module.exports = {
   dummy,
   totalLikes,
   favoriteBlog,
   mostBlogs,
+  mostLikes,
 };

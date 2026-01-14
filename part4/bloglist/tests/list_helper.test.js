@@ -5,6 +5,7 @@ const {
   totalLikes,
   favoriteBlog,
   mostBlogs,
+  mostLikes,
 } = require("../utils/list_helper");
 
 const emptyList = [];
@@ -126,5 +127,28 @@ describe("Most Blogs", () => {
   test("of bigger list is calculated right", () => {
     const result = mostBlogs(biggerListBlog);
     assert.deepStrictEqual(result, { author: "Robert C. Martin", blogs: 3 });
+  });
+});
+
+describe("Most Likes", () => {
+  test("of empty list is Null", () => {
+    const result = mostLikes(emptyList);
+    assert.strictEqual(result, null);
+  });
+
+  test("when list has only one blog, equals to the blog", () => {
+    const result = mostLikes(listWithOneBlog);
+    assert.deepStrictEqual(result, {
+      author: "Edsger W. Dijkstra",
+      likes: 5,
+    });
+  });
+
+  test("of bigger list is calculated right", () => {
+    const result = mostLikes(biggerListBlog);
+    assert.deepStrictEqual(result, {
+      author: "Edsger W. Dijkstra",
+      likes: 17,
+    });
   });
 });
