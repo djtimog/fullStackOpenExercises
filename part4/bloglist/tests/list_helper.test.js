@@ -1,6 +1,11 @@
 const { test, describe } = require("node:test");
 const assert = require("node:assert");
-const { dummy, totalLikes, favoriteBlog } = require("../utils/list_helper");
+const {
+  dummy,
+  totalLikes,
+  favoriteBlog,
+  mostBlogs,
+} = require("../utils/list_helper");
 
 const emptyList = [];
 
@@ -104,5 +109,22 @@ describe("Favorite Blog", () => {
   test("of bigger list is calculated right", () => {
     const result = favoriteBlog(biggerListBlog);
     assert.deepStrictEqual(result, biggerListBlog[2]);
+  });
+});
+
+describe("Most Blogs", () => {
+  test("of empty list is Null", () => {
+    const result = mostBlogs(emptyList);
+    assert.strictEqual(result, null);
+  });
+
+  test("when list has only one blog, equals to the blog", () => {
+    const result = mostBlogs(listWithOneBlog);
+    assert.deepStrictEqual(result, { author: "Edsger W. Dijkstra", blogs: 1 });
+  });
+
+  test("of bigger list is calculated right", () => {
+    const result = mostBlogs(biggerListBlog);
+    assert.deepStrictEqual(result, { author: "Robert C. Martin", blogs: 3 });
   });
 });
