@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
-require("dotenv").config();
+const { MONGODB_URI } = require("../utils/config");
 
-const mongoUrl = process.env.MONGODB_URI;
+const mongoUrl = MONGODB_URI;
 
 mongoose
   .connect(mongoUrl, { family: 4 })

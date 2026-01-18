@@ -1,8 +1,13 @@
+const logger = require("./logger");
+const { InProduction } = require("./config");
+
 const requestLogger = (request, response, next) => {
-  console.log("Method:", request.method);
-  console.log("Path:  ", request.path);
-  console.log("Body:  ", request.body);
-  console.log("---");
+  if (!InProduction) {
+    logger.info(`Method: ${request.method}`);
+    logger.info(`Path:   ${request.path}`);
+    logger.info(`Body:   ${JSON.stringify(request.body)}`);
+    logger.info("---");
+  }
   next();
 };
 
@@ -14,7 +19,9 @@ const errorHandler = (error, request, response, next) => {
   if (error.name === "ValidationError") {
     return response.status(400).json({ error: error.message });
   }
-  console.error(`Unhandled error: ${error.message}`);
+  if (!InProduction) {
+    logger.error(`Unhandled error: ${error.message}`);
+  }
   next(error);
 };
 
