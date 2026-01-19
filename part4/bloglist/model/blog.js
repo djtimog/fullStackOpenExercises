@@ -11,7 +11,7 @@ const blogSchema = mongoose.Schema({
   title: { type: String, required: true, minlength: 3 },
   author: { type: String, required: true, minlength: 3 },
   url: { type: String, required: true },
-  likes: Number,
+  likes: { type: Number, default: 0 },
 });
 
 blogSchema.set("toJSON", {

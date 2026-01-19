@@ -48,6 +48,24 @@ describe("Blog list API tests", () => {
     assert.strictEqual(getResponse.body.length, blogs.length + 1);
     assert.deepEqual({ author, likes, title, url }, newBlog);
   });
+
+  test.only("If likes property is missing, it will default to 0", async () => {
+    const blogWithoutLikes = {
+      title: "Blog without likes",
+      author: "New Author",
+      url: "https://example.com/blog-without-likes",
+    };
+
+    const postResponse = await api
+      .post("/api/blogs")
+      .send(blogWithoutLikes)
+      .expect(201)
+      .expect("Content-Type", /application\/json/);
+
+    const { likes } = postResponse.body;
+
+    assert.strictEqual(likes, 0);
+  });
 });
 
 after(async () => {
