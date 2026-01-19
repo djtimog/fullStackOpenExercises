@@ -14,7 +14,7 @@ describe("Blog list API tests", () => {
     likes: 0,
   };
 
-  test.only("Get all blog list from db", async () => {
+  test("Get all blog list from db", async () => {
     const response = await api
       .get("/api/blogs")
       .expect(200)
@@ -73,7 +73,7 @@ describe("Blog list API tests", () => {
     await api.post("/api/blogs").send(blogWithoutTitleAndUrl).expect(400);
   });
 
-  test.only("Delete a blog by id", async () => {
+  test("Delete a blog by id", async () => {
     const blogToDelete = blogs[0];
 
     await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
