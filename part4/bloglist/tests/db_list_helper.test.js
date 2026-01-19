@@ -14,7 +14,7 @@ describe("Blog list API tests", () => {
     likes: 0,
   };
 
-  test("Get all blog list from db", async () => {
+  test.only("Get all blog list from db", async () => {
     const response = await api
       .get("/api/blogs")
       .expect(200)
@@ -49,7 +49,7 @@ describe("Blog list API tests", () => {
     assert.deepEqual({ author, likes, title, url }, newBlog);
   });
 
-  test.only("If likes property is missing, it will default to 0", async () => {
+  test("If likes property is missing, it will default to 0", async () => {
     const blogWithoutLikes = {
       title: "Blog without likes",
       author: "New Author",
@@ -65,6 +65,38 @@ describe("Blog list API tests", () => {
     const { likes } = postResponse.body;
 
     assert.strictEqual(likes, 0);
+  });
+
+  test("Blog without title and url is not added", async () => {
+    const blogWithoutTitleAndUrl = {};
+
+    await api.post("/api/blogs").send(blogWithoutTitleAndUrl).expect(400);
+  });
+
+  test.only("Delete a blog by id", async () => {
+    const blogToDelete = blogs[0];
+
+    await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+
+    const getResponse = await api
+      .get("/api/blogs")
+      .expect(200)
+      .expect("Content-Type", /application\/json/);
+
+    assert.strictEqual(getResponse.body.length, blogs.length - 1);
+  });
+
+  test("Update a blog's likes by id", async () => {
+    const blogToUpdate = blogs[1];
+    const updatedLikes = { likes: blogToUpdate.likes + 10 };
+
+    const putResponse = await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send(updatedLikes)
+      .expect(200)
+      .expect("Content-Type", /application\/json/);
+
+    assert.strictEqual(putResponse.body.likes, blogToUpdate.likes + 10);
   });
 });
 
