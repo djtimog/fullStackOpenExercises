@@ -2,14 +2,14 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const logger = require("./utils/logger");
-const blogRouter = require("./controller/blog");
+const blogRouter = require("./controllers/blog");
 const {
   requestLogger,
   unknownEndpoint,
   errorHandler,
 } = require("./utils/middleware");
-const { MONGODB_URI } = require("../utils/config");
-const { InProduction } = require("./utils/config");
+const { MONGODB_URI, InProduction } = require("./utils/config");
+const userRouter = require("./controllers/user");
 
 const mongoUrl = MONGODB_URI;
 const app = express();
@@ -31,6 +31,7 @@ mongoose
   });
 
 app.use("/api/blogs", blogRouter);
+app.use("/api/users", userRouter);
 
 app.use(unknownEndpoint);
 app.use(errorHandler);
