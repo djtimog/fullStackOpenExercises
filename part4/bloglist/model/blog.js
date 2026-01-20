@@ -1,11 +1,4 @@
 const mongoose = require("mongoose");
-const { MONGODB_URI } = require("../utils/config");
-
-const mongoUrl = MONGODB_URI;
-
-mongoose
-  .connect(mongoUrl, { family: 4 })
-  .then(() => console.log("connected to MongoDB"));
 
 const blogSchema = mongoose.Schema({
   title: { type: String, required: true, minlength: 3 },

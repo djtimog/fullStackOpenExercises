@@ -2,14 +2,12 @@ const logger = require("./logger");
 const { InProduction } = require("./config");
 
 const requestLogger = (request, response, next) => {
-  if (!InProduction) {
-    logger.info(`Method: ${request.method}`);
-    logger.info(`Path:   ${request.path}`);
-    logger.info(`Body:   ${JSON.stringify(request.body)}`);
-    logger.info("---");
-  }
-  next();
+  logger.info(`Method: ${request.method}`);
+  logger.info(`Path:   ${request.path}`);
+  logger.info(`Body:   ${JSON.stringify(request.body)}`);
+  logger.info("---");
 };
+next();
 
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: "unknown endpoint" });
