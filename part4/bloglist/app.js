@@ -10,6 +10,7 @@ const {
 } = require("./utils/middleware");
 const { MONGODB_URI, InProduction } = require("./utils/config");
 const userRouter = require("./controllers/user");
+const loginRouter = require("./controllers/login");
 
 const mongoUrl = MONGODB_URI;
 const app = express();
@@ -32,6 +33,7 @@ mongoose
 
 app.use("/api/blogs", blogRouter);
 app.use("/api/users", userRouter);
+app.use("/api/login", loginRouter);
 
 app.use(unknownEndpoint);
 app.use(errorHandler);
