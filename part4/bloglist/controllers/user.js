@@ -12,17 +12,21 @@ userRouter.get("/", async (request, response) => {
 });
 
 userRouter.post("/", async (request, response, next) => {
+  const { username, name, password } = request.body;
+  if (!password || password.length < 3) {
+    return response
+      .status(400)
+      .json({ error: "Password must be at least 3 characters long" });
+  }
+  const salt = 10;
+  const hashedPassword = await bcrypt.hash(password, salt);
+
+  const user = new User({
+    username,
+    name,
+    passwordHashed: hashedPassword,
+  });
   try {
-    const { username, name, password } = request.body;
-    const salt = 10;
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    const user = new User({
-      username,
-      name,
-      passwordHashed: hashedPassword,
-    });
-
     const savedUser = await user.save();
     response.status(201).json(savedUser);
   } catch (error) {
