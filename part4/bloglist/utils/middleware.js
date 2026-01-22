@@ -67,14 +67,22 @@ const tokenExtractor = (request, response, next) => {
 };
 
 const userExtractor = async (request, response, next) => {
-  const { decodedToken } = request.body;
-
-  if (decodedToken) {
-    const user = await User.findById(decodedToken.id);
-    request.user = user;
+  if (!request.body) {
+    request.body = {};
   }
+  try {
+    const { decodedToken } = request.body;
 
-  next();
+    if (decodedToken) {
+      const user = await User.findById(decodedToken.id);
+      request.user = user;
+    }
+
+    next();
+  } catch (error) {
+    logger.error(`userExtractor error: ${error.message}`);
+    next(error);
+  }
 };
 
 module.exports = {

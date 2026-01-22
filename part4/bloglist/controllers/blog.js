@@ -16,13 +16,20 @@ router.get("/", async (request, response) => {
 });
 
 router.post("/", async (request, response, next) => {
-  const { title, author, url, likes, user } = request.body;
+  const { title, author, url, likes } = request.body;
 
-  const blog = new Blog({ title, author, url, likes });
   try {
-    if (user) {
-      blog.user = user.id;
+    if (!request.user) {
+      return response.status(401).json({ error: "token required" });
     }
+
+    const blog = new Blog({
+      title,
+      author,
+      url,
+      likes,
+      user: request.user._id,
+    });
     const result = await blog.save();
     const populatedResult = await result.populate("user", {
       username: 1,
@@ -36,15 +43,18 @@ router.post("/", async (request, response, next) => {
 });
 
 router.delete("/:id", async (request, response, next) => {
-  const { user } = request.body;
   try {
+    if (!request.user) {
+      return response.status(401).json({ error: "token required" });
+    }
+
     const blog = await Blog.findById(request.params.id);
 
     if (!blog) {
       return response.status(404).json({ error: "blog not found" });
     }
 
-    if (blog.user.toString() !== user.id.toString()) {
+    if (blog.user.toString() !== request.user._id.toString()) {
       return response.status(401).json({ error: `Not Authorised` });
     }
     await Blog.findByIdAndDelete(request.params.id);
@@ -63,10 +73,10 @@ router.put("/:id", async (request, response, next) => {
       return response.status(404).end();
     }
 
-    foundBlog.title = blog.title;
-    foundBlog.author = blog.author;
-    foundBlog.url = blog.url;
-    foundBlog.likes = blog.likes;
+    foundBlog.title = blog.title ?? foundBlog.title;
+    foundBlog.author = blog.author ?? foundBlog.author;
+    foundBlog.url = blog.url ?? foundBlog.url;
+    foundBlog.likes = blog.likes ?? foundBlog.likes;
 
     const updatedBlog = await foundBlog.save();
 

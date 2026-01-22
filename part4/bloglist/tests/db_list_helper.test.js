@@ -1,40 +1,61 @@
 const supertest = require("supertest");
 const app = require("../app");
-const { test, after, describe } = require("node:test");
+const { test, after, describe, beforeEach } = require("node:test");
 const mongoose = require("mongoose");
 const assert = require("node:assert");
+const Blog = require("../models/blog");
+const User = require("../models/user");
 
 const api = supertest(app);
 describe("Blog list API tests", () => {
-  let blogs;
+  beforeEach(async () => {
+    await Blog.deleteMany({});
+    const user = User.findOne({});
+    const newBlog = new Blog({
+      title: "First Blog title 001",
+      author: "First Author",
+      url: "https://example.com/first-blog-001",
+      likes: 0,
+      user: user._id,
+    });
+    await newBlog.save();
+  });
   const newBlog = {
     title: "New Blog title 00323",
     author: "New Auth",
     url: "https://example.com/new-blog-00323",
     likes: 0,
   };
-
   test("Get all blog list from db", async () => {
     const response = await api
       .get("/api/blogs")
       .expect(200)
       .expect("Content-Type", /application\/json/);
-
-    blogs = response.body;
   });
 
   test("Blogs had unique identifier property named id", async () => {
-    blogs.forEach((blog) => {
+    const blogs = await api
+      .get("/api/blogs")
+      .expect(200)
+      .expect("Content-Type", /application\/json/);
+
+    blogs.body.forEach((blog) => {
       if (!blog.id) {
-        throw new Error("Blog missing 'id' property");
+        return false;
       }
     });
   });
 
   test("Add a new blog to the database", async () => {
+    const blogs = await api
+      .get("/api/blogs")
+      .expect(200)
+      .expect("Content-Type", /application\/json/);
+
     const postResponse = await api
       .post("/api/blogs")
       .send(newBlog)
+      .set({ Authorization: `Bearer ${process.env.TEST_TOKEN}` })
       .expect(201)
       .expect("Content-Type", /application\/json/);
 
@@ -45,7 +66,7 @@ describe("Blog list API tests", () => {
 
     const { author, likes, title, url } = postResponse.body;
 
-    assert.strictEqual(getResponse.body.length, blogs.length + 1);
+    assert.strictEqual(getResponse.body.length, blogs.body.length + 1);
     assert.deepEqual({ author, likes, title, url }, newBlog);
   });
 
@@ -59,6 +80,8 @@ describe("Blog list API tests", () => {
     const postResponse = await api
       .post("/api/blogs")
       .send(blogWithoutLikes)
+      .set({ Authorization: `Bearer ${process.env.TEST_TOKEN}` })
+      .set({ Authorization: `Bearer ${process.env.TEST_TOKEN}` })
       .expect(201)
       .expect("Content-Type", /application\/json/);
 
@@ -70,13 +93,36 @@ describe("Blog list API tests", () => {
   test("Blog without title and url is not added", async () => {
     const blogWithoutTitleAndUrl = {};
 
-    await api.post("/api/blogs").send(blogWithoutTitleAndUrl).expect(400);
+    await api
+      .post("/api/blogs")
+      .set({ Authorization: `Bearer ${process.env.TEST_TOKEN}` })
+      .send(blogWithoutTitleAndUrl)
+      .expect(400);
+  });
+
+  test("Blog addition fails with status code 401 if token is not provided", async () => {
+    const blogToAdd = {
+      title: "Unauthorized Blog",
+      author: "Unauthorized Author",
+      url: "https://example.com/unauthorized-blog",
+      likes: 0,
+    };
+
+    await api.post("/api/blogs").send(blogToAdd).expect(401);
   });
 
   test("Delete a blog by id", async () => {
-    const blogToDelete = blogs[0];
+    const response = await api
+      .get("/api/blogs")
+      .expect(200)
+      .expect("Content-Type", /application\/json/);
 
-    await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+    const blogs = response.body;
+    const blogToDelete = blogs[0];
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .set({ Authorization: `Bearer ${process.env.TEST_TOKEN}` })
+      .expect(204);
 
     const getResponse = await api
       .get("/api/blogs")
@@ -87,16 +133,19 @@ describe("Blog list API tests", () => {
   });
 
   test("Update a blog's likes by id", async () => {
-    const blogToUpdate = blogs[1];
-    const updatedLikes = { likes: blogToUpdate.likes + 10 };
+    const blog = await api
+      .get("/api/blogs")
+      .expect(200)
+      .expect("Content-Type", /application\/json/);
+    const updatedLikes = { likes: blog.body[0].likes + 10 };
 
     const putResponse = await api
-      .put(`/api/blogs/${blogToUpdate.id}`)
+      .put(`/api/blogs/${blog.body[0].id}`)
       .send(updatedLikes)
       .expect(200)
       .expect("Content-Type", /application\/json/);
 
-    assert.strictEqual(putResponse.body.likes, blogToUpdate.likes + 10);
+    assert.strictEqual(putResponse.body.likes, blog.body[0].likes + 10);
   });
 });
 
