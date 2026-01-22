@@ -1,0 +1,10 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRtb2ciLCJpZCI6IjY5NzE2NTFlNmNhYjQwNTk1MTE5ZGE5NSIsImlhdCI6MTc2OTAzOTE1NX0.K3H-YPrrTbvFeOKrRY1DSFoFXL3Sz6d42wls5zw4Js0
+  
+  {
+    "title": "The",
+    "author": "djtimog",
+    "url": "https://localhostwwrw",
+    "likes": 3
+  }
