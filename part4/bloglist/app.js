@@ -7,6 +7,8 @@ const {
   requestLogger,
   unknownEndpoint,
   errorHandler,
+  tokenExtractor,
+  userExtractor,
 } = require("./utils/middleware");
 const { MONGODB_URI, InProduction } = require("./utils/config");
 const userRouter = require("./controllers/user");
@@ -31,9 +33,11 @@ mongoose
     logger.error("error connection to MongoDB:", error.message);
   });
 
-app.use("/api/blogs", blogRouter);
-app.use("/api/users", userRouter);
 app.use("/api/login", loginRouter);
+app.use("/api/users", userRouter);
+
+app.use(tokenExtractor);
+app.use("/api/blogs", userExtractor, blogRouter);
 
 app.use(unknownEndpoint);
 app.use(errorHandler);

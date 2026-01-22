@@ -1,7 +1,6 @@
 const router = require("express").Router();
 const Blog = require("../models/blog");
 const User = require("../models/user");
-const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 router.get("/", async (request, response) => {
@@ -16,28 +15,11 @@ router.get("/", async (request, response) => {
   }
 });
 
-const getTokenFrom = (request) => {
-  const authorization = request.get("authorization");
-  if (authorization && authorization.startsWith("Bearer ")) {
-    return authorization.replace("Bearer ", "");
-  }
-  return null;
-};
-
 router.post("/", async (request, response, next) => {
-  const blog = new Blog(request.body);
+  const { title, author, url, likes, user } = request.body;
+
+  const blog = new Blog({ title, author, url, likes });
   try {
-    console.log(getTokenFrom(request), process.env.JWT_SECRET);
-    const decodedToken = jwt.verify(
-      getTokenFrom(request),
-      process.env.JWT_SECRET,
-    );
-
-    if (!decodedToken.id) {
-      return response.status(401).json({ error: "token invalid" });
-    }
-
-    const user = await User.findById(decodedToken.id);
     if (user) {
       blog.user = user.id;
     }
@@ -54,9 +36,19 @@ router.post("/", async (request, response, next) => {
 });
 
 router.delete("/:id", async (request, response, next) => {
+  const { user } = request.body;
   try {
+    const blog = await Blog.findById(request.params.id);
+
+    if (!blog) {
+      return response.status(404).json({ error: "blog not found" });
+    }
+
+    if (blog.user.toString() !== user.id.toString()) {
+      return response.status(401).json({ error: `Not Authorised` });
+    }
     await Blog.findByIdAndDelete(request.params.id);
-    response.status(204).end();
+    return response.status(204).end();
   } catch (error) {
     next(error);
   }
