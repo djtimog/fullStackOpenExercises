@@ -14,6 +14,7 @@ const App = () => {
   const [message, setMessage] = useState("");
   const [color, setColor] = useState("green");
   const createBlogRef = useRef(null);
+  const blogToShow = blogs.sort((a, b) => b.likes - a.likes);
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -119,7 +120,7 @@ const App = () => {
         <CreateBlog createBlog={createBlog} ref={createBlogRef} />
       </Togglable>
       {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blogToShow} />
       ))}
     </div>
   );
