@@ -79,8 +79,12 @@ router.put("/:id", async (request, response, next) => {
     foundBlog.likes = blog.likes ?? foundBlog.likes;
 
     const updatedBlog = await foundBlog.save();
+    const populatedBlog = await updatedBlog.populate("user", {
+      username: 1,
+      name: 1,
+    });
 
-    response.json(updatedBlog);
+    response.json(populatedBlog);
   } catch (error) {
     next(error);
   }
