@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import userService from "./services/user";
+import Notification from "./components/Notification";
 const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [user, setUser] = useState(null);
@@ -10,6 +11,8 @@ const App = () => {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [url, setUrl] = useState("");
+  const [message, setMessage] = useState("");
+  const [color, setColor] = useState("green");
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -32,10 +35,17 @@ const App = () => {
       username,
       password,
     };
-    const userData = await userService.login(userLogins);
-    setUser(userData);
-    blogService.setToken(userData.token);
-    localStorage.setItem("loggedBlogListUser", JSON.stringify(userData));
+    try {
+      const userData = await userService.login(userLogins);
+      setUser(userData);
+      blogService.setToken(userData.token);
+      localStorage.setItem("loggedBlogListUser", JSON.stringify(userData));
+      setNotification(`Welcome back ${userData.name}`);
+    } catch (error) {
+      setNotification("Wrong username or password", "red");
+      console.log(error);
+      return;
+    }
     setUsername("");
     setPassword("");
   };
@@ -56,15 +66,28 @@ const App = () => {
 
     const savedBlog = await blogService.create(newBlog);
     setBlogs((prev) => [...prev, savedBlog]);
+    setNotification(
+      `A new blog ${savedBlog.title} by ${savedBlog.author} added`,
+    );
     setTitle("");
     setAuthor("");
     setUrl("");
+  };
+
+  const setNotification = (msg, color = "green") => {
+    setColor(color);
+    setMessage(msg);
+
+    setTimeout(() => {
+      setMessage(null);
+    }, 3000);
   };
 
   if (user === null) {
     return (
       <div>
         <h2>Log in to application</h2>
+        {message && <Notification color={color} message={message} />}
         <form onSubmit={login}>
           <div>
             <label>
@@ -95,6 +118,7 @@ const App = () => {
 
   return (
     <div>
+      {message && <Notification color={color} message={message} />}
       <h2>Blogs</h2>
       {user.name} logged in
       <button onClick={logout}>logout</button>
