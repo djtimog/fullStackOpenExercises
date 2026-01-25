@@ -6,6 +6,7 @@ import Notification from "./components/Notification";
 import Togglable from "./components/Togglable";
 import CreateBlog from "./components/CreateBlog";
 import { useRef } from "react";
+
 const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [user, setUser] = useState(null);
@@ -14,7 +15,7 @@ const App = () => {
   const [message, setMessage] = useState("");
   const [color, setColor] = useState("green");
   const createBlogRef = useRef(null);
-  const blogToShow = blogs.sort((a, b) => b.likes - a.likes);
+  const blogsToShow = blogs.sort((a, b) => b.likes - a.likes);
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -74,6 +75,20 @@ const App = () => {
     }, 3000);
   };
 
+  const deleteBlog = async (blog) => {
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
+      try {
+        await blogService.remove(blog.id);
+
+        setBlogs(blogs.filter((b) => b.id !== blog.id));
+        setNotification(`Blog ${blog.title} by ${blog.author} removed`);
+      } catch (error) {
+        setNotification(`Not authorised to remove blog: ${blog.title}`, "red");
+        console.log(error);
+      }
+    }
+  };
+
   if (user === null) {
     return (
       <div>
@@ -119,8 +134,8 @@ const App = () => {
       <Togglable label="create new blog" ref={createBlogRef}>
         <CreateBlog createBlog={createBlog} ref={createBlogRef} />
       </Togglable>
-      {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blogToShow} />
+      {blogsToShow.map((blog) => (
+        <Blog key={blog.id} blog={blog} deleteBlog={deleteBlog} />
       ))}
     </div>
   );
