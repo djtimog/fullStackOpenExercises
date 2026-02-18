@@ -37,7 +37,11 @@ const Blog = ({ blog, deleteBlog }) => {
             <button onClick={updateLikes}>like</button>
           </div>
           <div>{blogDetails.user.name}</div>
-          <button onClick={() => deleteBlog(blog)}>remove</button>
+          {blogDetails.user.username ===
+            JSON.parse(window.localStorage.getItem("loggedBlogappUser"))
+              .username && (
+            <button onClick={() => deleteBlog(blog)}>remove</button>
+          )}
         </div>
       )}
     </div>

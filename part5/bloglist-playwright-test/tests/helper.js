@@ -17,7 +17,17 @@ const createBlog = async (page, title, author, url) => {
   await page.getByRole("button", { name: "create" }).click();
 };
 
+const createUser = async (page, username, name, password) => {
+  const user = {
+    username,
+    name,
+    password,
+  };
+  await page.request.post("/api/users", { data: user });
+};
+
 module.exports = {
   login,
   createBlog,
+  createUser,
 };

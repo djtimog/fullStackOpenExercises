@@ -1,14 +1,9 @@
 const { test, expect, beforeEach, describe } = require("@playwright/test");
-const { login, createBlog } = require("./helper");
+const { login, createBlog, createUser } = require("./helper");
 describe("Blog app", () => {
   beforeEach(async ({ page }) => {
     await page.request.post("/api/testing/reset");
-    const user = {
-      username: "testuser",
-      name: "Test User",
-      password: "password123",
-    };
-    await page.request.post("/api/users", { data: user });
+    await createUser(page, "testuser", "Test User", "password123");
     await page.goto("/");
   });
 
@@ -84,6 +79,24 @@ describe("Blog app", () => {
 
       await expect(
         page.getByText("Blog To Delete Author To Delete"),
+      ).not.toBeVisible();
+    });
+
+    test("only user can delete their blog", async ({ page }) => {
+      await createBlog(page, "User1's Blog", "User1", "http://user1blog.com");
+
+      await createUser(page, "otheruser", "Other User", "password456");
+
+      await page.getByRole("button", { name: "logout" }).click();
+      await login(page, "otheruser", "password456");
+
+      const blog = page.locator(".blog-title", {
+        hasText: "User1's Blog",
+      });
+      await blog.getByRole("button", { name: "view" }).click();
+
+      await expect(
+        blog.getByRole("button", { name: "remove" }),
       ).not.toBeVisible();
     });
   });
