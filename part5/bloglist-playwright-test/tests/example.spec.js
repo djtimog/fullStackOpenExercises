@@ -53,7 +53,7 @@ describe("Blog app", () => {
         "http://anotherblog.com",
       );
 
-      const blog = page.locator(".blog-title", {
+      const blog = page.locator(".blog", {
         hasText: "Another Blog Title",
       });
       await blog.getByRole("button", { name: "view" }).click();
@@ -69,7 +69,7 @@ describe("Blog app", () => {
         "http://deletethisblog.com",
       );
 
-      const blog = page.locator(".blog-title", {
+      const blog = page.locator(".blog", {
         hasText: "Blog To Delete",
       });
       await blog.getByRole("button", { name: "view" }).click();
@@ -90,7 +90,7 @@ describe("Blog app", () => {
       await page.getByRole("button", { name: "logout" }).click();
       await login(page, "otheruser", "password456");
 
-      const blog = page.locator(".blog-title", {
+      const blog = page.locator(".blog", {
         hasText: "User1's Blog",
       });
       await blog.getByRole("button", { name: "view" }).click();
@@ -98,6 +98,22 @@ describe("Blog app", () => {
       await expect(
         blog.getByRole("button", { name: "remove" }),
       ).not.toBeVisible();
+    });
+
+    test("blogs are arranged according to likes", async ({ page }) => {
+      await createBlog(page, "Least Liked Blog", "Author1", "http://blog1.com");
+      await createBlog(page, "Most Liked Blog", "Author2", "http://blog2.com");
+      await createBlog(page, "Third Liked Blog", "Author3", "http://blog3.com");
+      const blogs = await page.locator(".blog").all();
+      const mostLiked = blogs[1];
+
+      await mostLiked.getByRole("button", { name: "view" }).click();
+      await mostLiked.getByRole("button", { name: "like" }).click();
+      page.reload();
+      const newBlogs = await page.locator(".blog").all();
+      await expect(newBlogs[0]).toContainText("Most Liked Blog");
+      await expect(newBlogs[1]).toContainText("Least Liked Blog");
+      await expect(newBlogs[2]).toContainText("Third Liked Blog");
     });
   });
 });

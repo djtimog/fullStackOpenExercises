@@ -135,7 +135,7 @@ const App = () => {
         <CreateBlog createBlog={createBlog} ref={createBlogRef} />
       </Togglable>
       {blogsToShow.map((blog) => (
-        <Blog key={blog.id} blog={blog} deleteBlog={deleteBlog} />
+        <Blog key={blog.id} blog={blog} user={user} deleteBlog={deleteBlog} />
       ))}
     </div>
   );

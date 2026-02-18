@@ -1,7 +1,7 @@
 import { useState } from "react";
 import blogService from "../services/blogs";
 
-const Blog = ({ blog, deleteBlog }) => {
+const Blog = ({ blog, deleteBlog, user }) => {
   const [blogDetails, setBlogDetails] = useState(blog);
   const [viewDetails, setViewDetails] = useState(false);
   const blogStyle = {
@@ -22,7 +22,7 @@ const Blog = ({ blog, deleteBlog }) => {
   };
 
   return (
-    <div style={blogStyle} className="blog-title">
+    <div style={blogStyle} className="blog">
       <div>
         {blogDetails.title} {blogDetails.author}
         <button onClick={() => setViewDetails(!viewDetails)}>
@@ -37,9 +37,7 @@ const Blog = ({ blog, deleteBlog }) => {
             <button onClick={updateLikes}>like</button>
           </div>
           <div>{blogDetails.user.name}</div>
-          {blogDetails.user.username ===
-            JSON.parse(window.localStorage.getItem("loggedBlogappUser"))
-              .username && (
+          {blogDetails.user.name === user.name && (
             <button onClick={() => deleteBlog(blog)}>remove</button>
           )}
         </div>
