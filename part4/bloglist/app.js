@@ -10,9 +10,10 @@ const {
   tokenExtractor,
   userExtractor,
 } = require("./utils/middleware");
-const { MONGODB_URI, InProduction } = require("./utils/config");
+const { MONGODB_URI, InProduction, InTest } = require("./utils/config");
 const userRouter = require("./controllers/user");
 const loginRouter = require("./controllers/login");
+const testingRouter = require("./controllers/testing");
 
 const mongoUrl = MONGODB_URI;
 const app = express();
@@ -38,6 +39,9 @@ app.use("/api/users", userRouter);
 
 app.use(tokenExtractor);
 app.use("/api/blogs", userExtractor, blogRouter);
+if (InTest) {
+  app.use("/api/testing", testingRouter);
+}
 
 app.use(unknownEndpoint);
 app.use(errorHandler);

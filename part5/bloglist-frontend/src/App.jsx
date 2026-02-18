@@ -127,7 +127,7 @@ const App = () => {
       {message && <Notification color={color} message={message} />}
       <h2>Blogs</h2>
       <div>
-        {user.name} logged in
+        <div>{user.name} logged in</div>
         <button onClick={logout}>logout</button>
       </div>
 
