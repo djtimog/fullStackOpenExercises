@@ -22,7 +22,7 @@ const Blog = ({ blog, deleteBlog }) => {
   };
 
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} className="blog-title">
       <div>
         {blogDetails.title} {blogDetails.author}
         <button onClick={() => setViewDetails(!viewDetails)}>
