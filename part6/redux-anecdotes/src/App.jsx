@@ -4,15 +4,12 @@ import AnecdoteList from "./components/AnecdoteList";
 import Filter from "./components/Filter";
 import Notification from "./components/Notification";
 import { useEffect } from "react";
-import { setAnecdote } from "./reducers/anecdoteReducer";
-import anecdotesService from "./services/anecdotes";
+import { initialAnecdote } from "./reducers/anecdoteReducer";
 const App = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    anecdotesService.getAll().then((anecdotes) => {
-      dispatch(setAnecdote(anecdotes));
-    });
+    dispatch(initialAnecdote());
   }, [dispatch]);
   return (
     <div>

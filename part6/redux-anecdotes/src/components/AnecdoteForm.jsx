@@ -1,8 +1,7 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import anecdoteService from "../services/anecdotes";
 import { setNotification } from "../reducers/notificationReducer";
-import { createAnecdote } from "../reducers/anecdoteReducer";
+import { appendAnecdote } from "../reducers/anecdoteReducer";
 function AnecdoteForm() {
   const dispatch = useDispatch();
   const handleAnecdote = (event) => {
@@ -10,10 +9,8 @@ function AnecdoteForm() {
 
     const content = event.target.anecdote.value;
     event.target.anecdote.value = "";
-    anecdoteService
-      .createNew(content)
-      .then((data) => dispatch(createAnecdote(data)));
-    dispatch(setNotification(`You created '${content}'`));
+    dispatch(appendAnecdote(content));
+    dispatch(setNotification(`You created '${content}'`, 2));
   };
   return (
     <div>
