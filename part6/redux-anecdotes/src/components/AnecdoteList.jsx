@@ -1,7 +1,10 @@
-import React from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { voteAnecdote } from "../reducers/anecdoteReducer";
+import { setNotification } from "../reducers/notificationReducer";
 
 function AnecdoteList() {
+  const dispatch = useDispatch();
+
   const anecdotes = useSelector((state) => {
     return state.anecdotes
       .filter((anecdote) =>
@@ -9,14 +12,12 @@ function AnecdoteList() {
       )
       .sort((a, b) => b.votes - a.votes);
   });
-  const dispatch = useDispatch();
+
   const vote = (anecdote) => {
-    dispatch({ type: "anecdote/voteAnecdote", payload: { id: anecdote.id } });
-    dispatch({
-      type: "notification/setNotification",
-      payload: `You voted '${anecdote.content}'`,
-    });
+    dispatch(voteAnecdote({ id: anecdote.id }));
+    dispatch(setNotification(`You voted '${anecdote.content}'`));
   };
+
   return (
     <div>
       {anecdotes.map((anecdote) => (
