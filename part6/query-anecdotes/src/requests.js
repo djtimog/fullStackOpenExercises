@@ -37,7 +37,6 @@ export const updateAnecdotes = async (anecdote) => {
     ...anecdote,
     votes: anecdote.votes + 1,
   }
-  console.log(newAnecdote)
 
   const options = {
     method: 'PUT',
