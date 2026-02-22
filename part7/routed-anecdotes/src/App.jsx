@@ -89,8 +89,8 @@ const CreateNew = (props) => {
       info: info.value,
       votes: 0,
     });
-
     e.target.reset();
+
     navigate("/");
     props.setNotification(`a new anecdote "${content.value}" created!`);
     setTimeout(() => {
@@ -98,10 +98,16 @@ const CreateNew = (props) => {
     }, 5000);
   };
 
+  const handleReset = () => {
+    content.reset();
+    author.reset();
+    info.reset();
+  };
+
   return (
     <div>
       <h2>create a new anecdote</h2>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} onReset={handleReset}>
         <div>
           content
           <input
@@ -122,7 +128,8 @@ const CreateNew = (props) => {
           url for more info
           <input name={info.name} value={info.value} onChange={info.onChange} />
         </div>
-        <button>create</button>
+        <button type="submit">create</button>
+        <button type="reset">reset</button>
       </form>
     </div>
   );
