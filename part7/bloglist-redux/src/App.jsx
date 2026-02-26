@@ -6,16 +6,17 @@ import Notification from "./components/Notification";
 import Togglable from "./components/Togglable";
 import CreateBlog from "./components/CreateBlog";
 import { useRef } from "react";
+import { setNotification } from "./reducers/notification";
+import { useDispatch } from "react-redux";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [user, setUser] = useState(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
-  const [color, setColor] = useState("green");
   const createBlogRef = useRef(null);
   const blogsToShow = blogs.sort((a, b) => b.likes - a.likes);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -43,9 +44,9 @@ const App = () => {
       setUser(userData);
       blogService.setToken(userData.token);
       localStorage.setItem("loggedBlogListUser", JSON.stringify(userData));
-      setNotification(`Welcome back ${userData.name}`);
+      dispatch(setNotification(`Welcome back ${userData.name}`, "green"));
     } catch (error) {
-      setNotification("Wrong username or password", "red");
+      dispatch(setNotification("Wrong username or password", "red"));
       console.log(error);
       return;
     }
@@ -61,18 +62,12 @@ const App = () => {
   const createBlog = async (newBlog) => {
     const savedBlog = await blogService.create(newBlog);
     setBlogs((prev) => [...prev, savedBlog]);
-    setNotification(
-      `A new blog ${savedBlog.title} by ${savedBlog.author} added`,
+    dispatch(
+      setNotification(
+        `A new blog ${savedBlog.title} by ${savedBlog.author} added`,
+        "green",
+      ),
     );
-  };
-
-  const setNotification = (msg, color = "green") => {
-    setColor(color);
-    setMessage(msg);
-
-    setTimeout(() => {
-      setMessage(null);
-    }, 3000);
   };
 
   const deleteBlog = async (blog) => {
@@ -81,9 +76,19 @@ const App = () => {
         await blogService.remove(blog.id);
 
         setBlogs(blogs.filter((b) => b.id !== blog.id));
-        setNotification(`Blog ${blog.title} by ${blog.author} removed`);
+        dispatch(
+          setNotification(
+            `Blog ${blog.title} by ${blog.author} removed`,
+            "green",
+          ),
+        );
       } catch (error) {
-        setNotification(`Not authorised to remove blog: ${blog.title}`, "red");
+        dispatch(
+          setNotification(
+            `Not authorised to remove blog: ${blog.title}`,
+            "red",
+          ),
+        );
         console.log(error);
       }
     }
@@ -93,7 +98,7 @@ const App = () => {
     return (
       <div>
         <h2>Log in to application</h2>
-        {message && <Notification color={color} message={message} />}
+        <Notification />
         <form onSubmit={login}>
           <div>
             <label>
@@ -124,7 +129,7 @@ const App = () => {
 
   return (
     <div>
-      {message && <Notification color={color} message={message} />}
+      <Notification />
       <h2>Blogs</h2>
       <div>
         {user.name} logged in
