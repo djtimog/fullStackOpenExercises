@@ -11,6 +11,9 @@ function Notification() {
     padding: "0px 10px",
     marginBottom: "10px",
   };
+  if (notification.message === null) {
+    return null;
+  }
 
   return (
     <div style={style}>

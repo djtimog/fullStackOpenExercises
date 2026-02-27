@@ -6,7 +6,7 @@ const notificationSlice = createSlice({
   name: "notification",
   initialState: initailState,
   reducers: {
-    atateNotification(state, action) {
+    stateNotification(state, action) {
       return action.payload;
     },
     clearNotification() {
