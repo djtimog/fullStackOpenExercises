@@ -1,6 +1,7 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 import { logoutUser } from "../reducers/user";
+import { Link } from "react-router-dom";
 
 function UserDisplay({ user }) {
   const dispatch = useDispatch();
@@ -13,6 +14,9 @@ function UserDisplay({ user }) {
     <div>
       <h2>Blogs</h2>
       <div>
+        <div>
+          <Link to="/">blogs</Link> <Link to="/users">users</Link>
+        </div>
         {user.name} logged in
         <button onClick={logout}>logout</button>
       </div>

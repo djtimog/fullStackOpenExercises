@@ -1,14 +1,17 @@
 const router = require("express").Router();
 const Blog = require("../models/blog");
 const User = require("../models/user");
+const Comment = require("../models/comment");
 require("dotenv").config();
 
 router.get("/", async (request, response) => {
   try {
-    const blogs = await Blog.find({}).populate("user", {
-      username: 1,
-      name: 1,
-    });
+    const blogs = await Blog.find({})
+      .populate("user", {
+        username: 1,
+        name: 1,
+      })
+      .populate("comments", { message: 1 });
     response.json(blogs);
   } catch (error) {
     response.status(500).send({ error: "Failed to fetch blogs" });
@@ -31,12 +34,16 @@ router.post("/", async (request, response, next) => {
       user: request.user._id,
     });
     const result = await blog.save();
-    const populatedResult = await result.populate("user", {
+    await result.populate("user", {
       username: 1,
       name: 1,
     });
+    await result.populate("comments", { message: 1 });
 
-    response.status(201).json(populatedResult);
+    const user = await User.findById(request.user._id);
+    user.blogs = user.blogs.concat(result._id);
+    await user.save();
+    response.status(201).json(result);
   } catch (error) {
     next(error);
   }
@@ -79,14 +86,41 @@ router.put("/:id", async (request, response, next) => {
     foundBlog.likes = blog.likes ?? foundBlog.likes;
 
     const updatedBlog = await foundBlog.save();
-    const populatedBlog = await updatedBlog.populate("user", {
+    await updatedBlog.populate("user", {
       username: 1,
       name: 1,
     });
+    await updatedBlog.populate("comments", { message: 1 });
 
-    response.json(populatedBlog);
+    response.json(updatedBlog);
   } catch (error) {
     next(error);
+  }
+});
+
+router.post("/:id/comments", async (request, response) => {
+  const { id } = request.params;
+  const body = request.body;
+  try {
+    const foundBlog = await Blog.findById(id);
+    const comment = new Comment({
+      message: body.message,
+      blog: foundBlog._id,
+    });
+
+    const result = await comment.save().populate("blogs", {
+      title: 1,
+      author: 1,
+      url: 1,
+      id: 1,
+    });
+
+    foundBlog.comments = foundBlog.comments.concat(result._id);
+    await foundBlog.save();
+
+    response.status(200).json(result);
+  } catch (error) {
+    response.status(400).json({ error: "Unable to create comment" });
   }
 });
 

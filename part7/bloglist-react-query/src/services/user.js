@@ -6,9 +6,4 @@ const login = async (credentials) => {
   return request.data;
 };
 
-const getAll = async () => {
-  const request = await axios.get("/api/users");
-  return request.data;
-};
-
-export default { login, getAll };
+export default { login };
