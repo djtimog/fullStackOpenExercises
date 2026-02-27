@@ -1,9 +1,10 @@
 import { useState } from "react";
-import blogService from "../services/blogs";
+import { deleteBlog, likeBlog } from "../reducers/blogs";
+import { useDispatch } from "react-redux";
 
-const Blog = ({ blog, deleteBlog, user }) => {
-  const [blogDetails, setBlogDetails] = useState(blog);
+const Blog = ({ blog, user }) => {
   const [viewDetails, setViewDetails] = useState(false);
+  const dispatch = useDispatch();
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -13,32 +14,33 @@ const Blog = ({ blog, deleteBlog, user }) => {
   };
 
   const updateLikes = async () => {
-    const updatedBlog = {
-      ...blogDetails,
-      likes: blogDetails.likes + 1,
-    };
-    const data = await blogService.update(blog.id, updatedBlog);
-    setBlogDetails(data);
+    dispatch(likeBlog(blog));
+  };
+
+  const remove = async () => {
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
+      dispatch(deleteBlog(blog));
+    }
   };
 
   return (
     <div style={blogStyle} className="blog">
       <div>
-        {blogDetails.title} {blogDetails.author}
+        {blog.title} {blog.author}
         <button onClick={() => setViewDetails(!viewDetails)}>
           {viewDetails ? "hide" : "view"}
         </button>
       </div>
       {viewDetails && (
         <div>
-          <div className="blog-url">{blogDetails.url}</div>
+          <div className="blog-url">{blog.url}</div>
           <div className="blog-like">
-            likes {blogDetails.likes}
+            likes {blog.likes}
             <button onClick={updateLikes}>like</button>
           </div>
-          <div>{blogDetails.user.name}</div>
-          {blogDetails.user.name === user.name && (
-            <button onClick={() => deleteBlog(blog)}>remove</button>
+          <div>{blog.user.name}</div>
+          {blog.user.name === user.name && (
+            <button onClick={() => remove(blog)}>remove</button>
           )}
         </div>
       )}

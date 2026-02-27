@@ -1,12 +1,13 @@
-import React from "react";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { createBlog } from "../reducers/blogs";
 
-function CreateBlog({ createBlog, ref }) {
+function CreateBlog({ ref }) {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [url, setUrl] = useState("");
-
-  const handleSubmit = async (event) => {
+  const dispatch = useDispatch();
+  const handleSubmit = (event) => {
     event.preventDefault();
 
     const newBlog = {
@@ -15,7 +16,7 @@ function CreateBlog({ createBlog, ref }) {
       url,
     };
 
-    await createBlog(newBlog);
+    dispatch(createBlog(newBlog));
     ref.current.toggleVisibility();
     setTitle("");
     setAuthor("");
