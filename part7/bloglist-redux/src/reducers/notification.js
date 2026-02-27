@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initailState = { message: null, color: null };
 
-const notificationSlice = createSlice({
+const notificationReducer = createSlice({
   name: "notification",
   initialState: initailState,
   reducers: {
@@ -15,7 +15,7 @@ const notificationSlice = createSlice({
   },
 });
 
-const { stateNotification, clearNotification } = notificationSlice.actions;
+const { stateNotification, clearNotification } = notificationReducer.actions;
 const setNotification = (message, color) => {
   return (dispatch) => {
     dispatch(stateNotification({ message, color }));
@@ -27,4 +27,4 @@ const setNotification = (message, color) => {
 
 export { setNotification };
 
-export default notificationSlice.reducer;
+export default notificationReducer.reducer;

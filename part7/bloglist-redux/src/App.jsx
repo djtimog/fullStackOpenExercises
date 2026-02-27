@@ -1,26 +1,25 @@
 import { useState, useEffect } from "react";
 import Blog from "./components/Blog";
 import blogService from "./services/blogs";
-import userService from "./services/user";
 import Notification from "./components/Notification";
 import Togglable from "./components/Togglable";
 import CreateBlog from "./components/CreateBlog";
 import { useRef } from "react";
 import { setNotification } from "./reducers/notification";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import LoginForm from "./components/loginForm";
+import { initializeBlogs } from "./reducers/blogs";
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
   const [user, setUser] = useState(null);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const createBlogRef = useRef(null);
-  const blogsToShow = blogs.sort((a, b) => b.likes - a.likes);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
-  }, []);
+    dispatch(initializeBlogs());
+  }, [dispatch]);
+
+  const blogs = useSelector((state) => state.blogs);
 
   useEffect(() => {
     const loggedUserData = JSON.parse(
@@ -33,27 +32,6 @@ const App = () => {
     }
   }, []);
 
-  const login = async (event) => {
-    event.preventDefault();
-    const userLogins = {
-      username,
-      password,
-    };
-    try {
-      const userData = await userService.login(userLogins);
-      setUser(userData);
-      blogService.setToken(userData.token);
-      localStorage.setItem("loggedBlogListUser", JSON.stringify(userData));
-      dispatch(setNotification(`Welcome back ${userData.name}`, "green"));
-    } catch (error) {
-      dispatch(setNotification("Wrong username or password", "red"));
-      console.log(error);
-      return;
-    }
-    setUsername("");
-    setPassword("");
-  };
-
   const logout = () => {
     setUser(null);
     localStorage.removeItem("loggedBlogListUser");
@@ -61,7 +39,7 @@ const App = () => {
 
   const createBlog = async (newBlog) => {
     const savedBlog = await blogService.create(newBlog);
-    setBlogs((prev) => [...prev, savedBlog]);
+    // setBlogs((prev) => [...prev, savedBlog]);
     dispatch(
       setNotification(
         `A new blog ${savedBlog.title} by ${savedBlog.author} added`,
@@ -75,7 +53,7 @@ const App = () => {
       try {
         await blogService.remove(blog.id);
 
-        setBlogs(blogs.filter((b) => b.id !== blog.id));
+        // setBlogs(blogs.filter((b) => b.id !== blog.id));
         dispatch(
           setNotification(
             `Blog ${blog.title} by ${blog.author} removed`,
@@ -95,36 +73,7 @@ const App = () => {
   };
 
   if (user === null) {
-    return (
-      <div>
-        <h2>Log in to application</h2>
-        <Notification />
-        <form onSubmit={login}>
-          <div>
-            <label>
-              username
-              <input
-                type="text"
-                id="username"
-                value={username}
-                onChange={({ target }) => setUsername(target.value)}
-              />
-            </label>
-          </div>
-          <div>
-            <label>
-              password
-              <input
-                type="password"
-                value={password}
-                onChange={({ target }) => setPassword(target.value)}
-              />
-            </label>
-          </div>
-          <button type="submit">login</button>
-        </form>
-      </div>
-    );
+    return <LoginForm setUser={setUser} />;
   }
 
   return (
@@ -139,7 +88,7 @@ const App = () => {
       <Togglable label="create new blog" ref={createBlogRef}>
         <CreateBlog createBlog={createBlog} ref={createBlogRef} />
       </Togglable>
-      {blogsToShow.map((blog) => (
+      {blogs.map((blog) => (
         <Blog key={blog.id} blog={blog} user={user} deleteBlog={deleteBlog} />
       ))}
     </div>
