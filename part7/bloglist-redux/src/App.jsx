@@ -16,21 +16,20 @@ const App = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(initializeBlogs());
-  }, [dispatch]);
-
-  const [user, blogs] = useSelector((state) => [state.user, state.blogs]);
-
-  useEffect(() => {
     const loggedUserData = JSON.parse(
       localStorage.getItem("loggedBlogListUser"),
     );
 
     if (loggedUserData) {
-      dispatch(initializeUser({ loggedUserData }));
+      dispatch(initializeUser(loggedUserData));
       blogService.setToken(loggedUserData.token);
     }
+
+    dispatch(initializeBlogs());
   }, [dispatch]);
+
+  const user = useSelector((state) => state.user);
+  const blogs = useSelector((state) => state.blogs);
 
   if (user === null) {
     return <LoginForm />;
