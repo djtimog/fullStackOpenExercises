@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import Notification from "./components/Notification";
@@ -8,9 +8,10 @@ import { useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import LoginForm from "./components/loginForm";
 import { initializeBlogs } from "./reducers/blogs";
+import { initializeUser } from "./reducers/user";
+import UserDisplay from "./components/UserDisplay";
 
 const App = () => {
-  const [user, setUser] = useState(null);
   const createBlogRef = useRef(null);
   const dispatch = useDispatch();
 
@@ -18,7 +19,7 @@ const App = () => {
     dispatch(initializeBlogs());
   }, [dispatch]);
 
-  const blogs = useSelector((state) => state.blogs);
+  const [user, blogs] = useSelector((state) => [state.user, state.blogs]);
 
   useEffect(() => {
     const loggedUserData = JSON.parse(
@@ -26,28 +27,20 @@ const App = () => {
     );
 
     if (loggedUserData) {
-      setUser(loggedUserData);
+      dispatch(initializeUser({ loggedUserData }));
       blogService.setToken(loggedUserData.token);
     }
-  }, []);
-
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("loggedBlogListUser");
-  };
+  }, [dispatch]);
 
   if (user === null) {
-    return <LoginForm setUser={setUser} />;
+    return <LoginForm />;
   }
 
   return (
     <div>
       <Notification />
-      <h2>Blogs</h2>
-      <div>
-        {user.name} logged in
-        <button onClick={logout}>logout</button>
-      </div>
+
+      <UserDisplay user={user} />
 
       <Togglable label="create new blog" ref={createBlogRef}>
         <CreateBlog ref={createBlogRef} />

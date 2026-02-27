@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-import userService from "../services/user";
 import { useDispatch } from "react-redux";
-import { setNotification } from "../reducers/notification";
-import blogService from "../services/blogs";
-import Notification from "./Notification";
 
-function LoginForm({ setUser }) {
+import Notification from "./Notification";
+import { loginUser } from "../reducers/user";
+
+function LoginForm() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
@@ -16,17 +15,7 @@ function LoginForm({ setUser }) {
       username,
       password,
     };
-    try {
-      const userData = await userService.login(userLogins);
-      setUser(userData);
-      blogService.setToken(userData.token);
-      localStorage.setItem("loggedBlogListUser", JSON.stringify(userData));
-      dispatch(setNotification(`Welcome back ${userData.name}`, "green"));
-    } catch (error) {
-      dispatch(setNotification("Wrong username or password", "red"));
-      console.log(error);
-      return;
-    }
+    dispatch(loginUser(userLogins));
     setUsername("");
     setPassword("");
   };
