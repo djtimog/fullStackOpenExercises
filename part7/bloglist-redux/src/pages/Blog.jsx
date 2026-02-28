@@ -14,7 +14,6 @@ function Blog() {
   if (!blog) {
     return null;
   }
-
   return (
     <div>
       <h2>

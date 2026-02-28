@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import { addCommentToBlog } from "../reducers/blogs";
 import { useDispatch } from "react-redux";
 
-function Comments({id, comments }) {
-  const [comment, setComment] = useState();
+function Comments({ id, comments }) {
+  const [comment, setComment] = useState("");
   const dispatch = useDispatch();
   const handleSubmit = (event) => {
     event.preventDefault();
     dispatch(addCommentToBlog(id, comment));
-    console.log("Adding comment:", comment);
+
+    setComment("");
   };
   return (
     <div>
@@ -22,8 +23,8 @@ function Comments({id, comments }) {
         <button>Add Comment</button>
       </form>
       <ul>
-        {comments.map((comment) => (
-          <li key={comment.id}>{comment}</li>
+        {comments.map((comment, index) => (
+          <li key={index}>{comment.message}</li>
         ))}
       </ul>
     </div>

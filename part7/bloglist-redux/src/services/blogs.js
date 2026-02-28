@@ -33,8 +33,8 @@ const remove = async (id) => {
   return axios.delete(`${baseUrl}/${id}`, config);
 };
 
-const addComment = async (id, comment) => {
-  const response = await axios.post(`${baseUrl}/${id}/comments`, { comment });
+const addComment = async (id, message) => {
+  const response = await axios.post(`${baseUrl}/${id}/comments`, { message });
   return response.data;
 };
 
