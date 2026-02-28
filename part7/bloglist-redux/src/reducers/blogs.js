@@ -104,6 +104,9 @@ export const addCommentToBlog = (id, comment) => {
   return async (dispatch) => {
     const updatedBlog = await blogsService.addComment(id, comment);
     dispatch(addComment(updatedBlog));
+    dispatch(
+      setNotification(`Comment added to blog ${updatedBlog.title}`, "green"),
+    );
   };
 };
 

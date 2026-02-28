@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { likeBlog } from "../reducers/blogs";
 import Comments from "../components/Comments";
+import Button from "react-bootstrap/Button";
 
 function Blog() {
   const { id } = useParams();
@@ -16,14 +17,20 @@ function Blog() {
   }
   return (
     <div>
-      <h2>
+      <h4>
         {blog.title} {blog.author}
-      </h2>
+      </h4>
 
       <a href={blog.url}>{blog.url}</a>
-      <div>
-        {blog.likes} likes
-        <button onClick={() => dispatch(likeBlog(blog))}>like</button>
+      <div className="mt-3">
+        <span className="me-2">{blog.likes} likes</span>
+        <Button
+          variant="primary"
+          onClick={() => dispatch(likeBlog(blog))}
+          size="sm"
+        >
+          like
+        </Button>
       </div>
 
       <p>added by {blog.user.name}</p>

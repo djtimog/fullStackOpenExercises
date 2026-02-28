@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { createBlog } from "../reducers/blogs";
+import Form from "react-bootstrap/Form";
+import Button from "react-bootstrap/Button";
 
 function CreateBlog({ ref }) {
   const [title, setTitle] = useState("");
@@ -26,39 +28,38 @@ function CreateBlog({ ref }) {
   return (
     <div>
       <h2>Create New</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>
-            Title
-            <input
-              type="text"
-              value={title}
-              onChange={({ target }) => setTitle(target.value)}
-            />
-          </label>
-        </div>
-        <div>
-          <label>
-            Author
-            <input
-              type="text"
-              value={author}
-              onChange={({ target }) => setAuthor(target.value)}
-            />
-          </label>
-        </div>
-        <div>
-          <label>
-            Url
-            <input
-              type="text"
-              value={url}
-              onChange={({ target }) => setUrl(target.value)}
-            />
-          </label>
-        </div>
-        <button type="submit">Create</button>
-      </form>
+      <Form onSubmit={handleSubmit}>
+        <Form.Group>
+          <Form.Label>Title</Form.Label>
+          <Form.Control
+            type="text"
+            value={title}
+            onChange={({ target }) => setTitle(target.value)}
+          />
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>Author</Form.Label>
+          <Form.Control
+            type="text"
+            value={author}
+            onChange={({ target }) => setAuthor(target.value)}
+          />
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>Url</Form.Label>
+          <Form.Control
+            type="text"
+            value={url}
+            onChange={({ target }) => setUrl(target.value)}
+          />
+        </Form.Group>
+
+        <Form.Group>
+          <Button variant="outline-secondary" type="submit">
+            Create
+          </Button>
+        </Form.Group>
+      </Form>
     </div>
   );
 }

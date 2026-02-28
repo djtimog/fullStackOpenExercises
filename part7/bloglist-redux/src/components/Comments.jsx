@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { addCommentToBlog } from "../reducers/blogs";
 import { useDispatch } from "react-redux";
+import ListGroup from "react-bootstrap/ListGroup";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
 
 function Comments({ id, comments }) {
   const [comment, setComment] = useState("");
@@ -13,20 +16,28 @@ function Comments({ id, comments }) {
   };
   return (
     <div>
-      <h4>comments</h4>
+      <h5>comments</h5>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          value={comment}
-          onChange={({ target }) => setComment(target.value)}
-        />
-        <button>Add Comment</button>
-      </form>
-      <ul>
+      <Form onSubmit={handleSubmit}>
+        <Form.Group className="mb-3">
+          <Form.Control
+            value={comment}
+            onChange={({ target }) => setComment(target.value)}
+            type="text"
+            placeholder="i love this blog"
+          />
+        </Form.Group>
+        <Form.Group>
+          <Button variant="success" type="submit">
+            Add Comment
+          </Button>
+        </Form.Group>
+      </Form>
+      <ListGroup className="mt-3">
         {comments.map((comment, index) => (
-          <li key={index}>{comment.message}</li>
+          <ListGroup.Item key={index}>{comment.message}</ListGroup.Item>
         ))}
-      </ul>
+      </ListGroup>
     </div>
   );
 }

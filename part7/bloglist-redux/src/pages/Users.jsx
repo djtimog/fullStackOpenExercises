@@ -1,14 +1,15 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import Table from "react-bootstrap/Table";
 
 function Users() {
   const users = useSelector((state) => state.usersInfos);
   return (
     <div>
-      <h2>Users</h2>
+      <h3>Users</h3>
 
-      <table>
+      <Table striped bordered hover>
         <thead>
           <tr>
             <th></th>
@@ -26,7 +27,7 @@ function Users() {
             </tr>
           ))}
         </tbody>
-      </table>
+      </Table>
     </div>
   );
 }

@@ -37,7 +37,7 @@ const App = () => {
   }
 
   return (
-    <div>
+    <div className="container">
       <Notification />
 
       <UserDisplay user={user} />

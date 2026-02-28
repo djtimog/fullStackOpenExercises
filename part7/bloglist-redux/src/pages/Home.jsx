@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import Blog from "../components/Blog";
 import CreateBlog from "../components/CreateBlog";
 import Togglable from "../components/Togglable";
+import ListGroup from "react-bootstrap/ListGroup";
 
 function Home() {
   const createBlogRef = useRef(null);
@@ -14,9 +15,13 @@ function Home() {
       <Togglable label="create new blog" ref={createBlogRef}>
         <CreateBlog ref={createBlogRef} />
       </Togglable>
-      {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
-      ))}
+      <ListGroup>
+        {blogs.map((blog) => (
+          <ListGroup.Item key={blog.id}>
+            <Blog blog={blog} />
+          </ListGroup.Item>
+        ))}
+      </ListGroup>
     </div>
   );
 }
