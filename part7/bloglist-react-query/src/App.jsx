@@ -6,20 +6,38 @@ import Notification from "./components/Notification";
 import Togglable from "./components/Togglable";
 import CreateBlog from "./components/CreateBlog";
 import { useRef } from "react";
+import { useNotification } from "./hooks";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
   const [user, setUser] = useState(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
-  const [color, setColor] = useState("green");
   const createBlogRef = useRef(null);
-  const blogsToShow = blogs.sort((a, b) => b.likes - a.likes);
+  const result = useQuery({
+    queryKey: ["blogs"],
+    queryFn: async () => {
+      const blogs = await blogService.getAll();
+      return blogs;
+    },
+  });
+  // const blogsToShow = blogs.sort((a, b) => b.likes - a.likes);
+  const { dispatch } = useNotification();
 
-  useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
-  }, []);
+  const blogMutation = useMutation({
+    mutationFn: async (newBlog) => {
+      const savedBlog = await blogService.create(newBlog);
+      return savedBlog;
+    },
+    onSuccess: (savedBlog) => {
+      const blogs = result.getQueryData(["blogs"]);
+      result.setQueryData(["blogs"], [...blogs, savedBlog]);
+      setNotification(
+        `A new blog ${savedBlog.title} by ${savedBlog.author} added`,
+      );
+      createBlogRef.current.toggleVisibility();
+    },
+  });
 
   useEffect(() => {
     const loggedUserData = JSON.parse(
@@ -59,41 +77,32 @@ const App = () => {
   };
 
   const createBlog = async (newBlog) => {
-    const savedBlog = await blogService.create(newBlog);
-    setBlogs((prev) => [...prev, savedBlog]);
-    setNotification(
-      `A new blog ${savedBlog.title} by ${savedBlog.author} added`,
-    );
+    blogMutation.mutate(newBlog);
   };
 
   const setNotification = (msg, color = "green") => {
-    setColor(color);
-    setMessage(msg);
-
-    setTimeout(() => {
-      setMessage(null);
-    }, 3000);
+    dispatch({ type: "SET_NOTIFICATION", payload: { message: msg, color } });
   };
 
-  const deleteBlog = async (blog) => {
-    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
-      try {
-        await blogService.remove(blog.id);
+  // const deleteBlog = async (blog) => {
+  //   if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
+  //     try {
+  //       await blogService.remove(blog.id);
 
-        setBlogs(blogs.filter((b) => b.id !== blog.id));
-        setNotification(`Blog ${blog.title} by ${blog.author} removed`);
-      } catch (error) {
-        setNotification(`Not authorised to remove blog: ${blog.title}`, "red");
-        console.log(error);
-      }
-    }
-  };
+  //       setBlogs(blogs.filter((b) => b.id !== blog.id));
+  //       setNotification(`Blog ${blog.title} by ${blog.author} removed`);
+  //     } catch (error) {
+  //       setNotification(`Not authorised to remove blog: ${blog.title}`, "red");
+  //       console.log(error);
+  //     }
+  //   }
+  // };
 
   if (user === null) {
     return (
       <div>
         <h2>Log in to application</h2>
-        {message && <Notification color={color} message={message} />}
+        <Notification />
         <form onSubmit={login}>
           <div>
             <label>
@@ -124,7 +133,7 @@ const App = () => {
 
   return (
     <div>
-      {message && <Notification color={color} message={message} />}
+      <Notification />
       <h2>Blogs</h2>
       <div>
         {user.name} logged in
@@ -134,8 +143,8 @@ const App = () => {
       <Togglable label="create new blog" ref={createBlogRef}>
         <CreateBlog createBlog={createBlog} ref={createBlogRef} />
       </Togglable>
-      {blogsToShow.map((blog) => (
-        <Blog key={blog.id} blog={blog} user={user} deleteBlog={deleteBlog} />
+      {result.data?.map((blog) => (
+        <Blog key={blog.id} blog={blog} />
       ))}
     </div>
   );
