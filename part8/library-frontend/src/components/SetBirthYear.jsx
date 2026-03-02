@@ -15,7 +15,6 @@ export default function SetBirthYear({ authorsName }) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log({ variables });
     setBirthYear({ variables });
     setVariables(defaultVariables);
   };

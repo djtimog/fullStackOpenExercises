@@ -28,9 +28,9 @@ export const NEW_BOOK = gql`
     $title: String!
     $published: Int!
     $author: String!
-    $genres: [String]
+    $genres: [String!]!
   ) {
-    newBook(
+    addBook(
       title: $title
       published: $published
       author: $author
