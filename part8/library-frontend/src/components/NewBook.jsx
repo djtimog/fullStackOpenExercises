@@ -9,7 +9,7 @@ const NewBook = () => {
   const [genre, setGenre] = useState("");
   const [genres, setGenres] = useState([]);
   const [newBook] = useMutation(NEW_BOOK, {
-    refetchQueries: [ALL_BOOKS],
+    refetchQueries: [{ query: ALL_BOOKS }],
   });
 
   const submit = async (event) => {
