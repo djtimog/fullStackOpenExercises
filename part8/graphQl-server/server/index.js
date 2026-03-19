@@ -7,13 +7,16 @@ import { SECRET } from "../config.js";
 import { User } from "../models/user.js";
 
 const getUserFromAuth = async (auth) => {
-  if (!auth) return null;
-  if (!auth.startWith("Bearer ")) return null;
+  if (!auth) {
+    console.log("no auth provided");
+    return null;
+  }
 
-  const token = auth.subString(7);
+  if (!auth.startsWith("Bearer ")) return null;
+
+  const token = auth.substring(7);
   const decodedToken = jwt.verify(token, SECRET);
-
-  return await User.findOne({ username: decodedToken.username });
+  return await User.findOne({ username: decodedToken.user.username });
 };
 
 export const startServer = (port) => {

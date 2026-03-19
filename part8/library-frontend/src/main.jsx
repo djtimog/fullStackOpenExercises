@@ -4,13 +4,23 @@ import App from "./App.jsx";
 import { BrowserRouter as Router } from "react-router-dom";
 import { ApolloClient, InMemoryCache, HttpLink } from "@apollo/client";
 import { ApolloProvider } from "@apollo/client/react";
+import { SetContextLink } from "@apollo/client/link/context";
 
-const cache = new InMemoryCache();
-const link = new HttpLink({ uri: "http://localhost:4000/" });
+const authLink = new SetContextLink(({ headers }) => {
+  const token = localStorage.getItem("token");
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `Bearer ${token}` : null,
+    },
+  };
+});
+
+const httpLink = new HttpLink({ uri: "http://localhost:4000" });
 
 const client = new ApolloClient({
-  cache: cache,
-  link: link,
+  cache: new InMemoryCache(),
+  link: authLink.concat(httpLink),
 });
 
 createRoot(document.getElementById("root")).render(

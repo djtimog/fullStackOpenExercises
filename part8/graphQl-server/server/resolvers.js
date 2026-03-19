@@ -79,6 +79,7 @@ export const resolvers = {
             born: 1,
             bookCount: 1,
           });
+          return storedBook;
         } catch (error) {
           throw new GraphQLError(`Saving book failed: ${error.message}`, {
             extensions: {
@@ -88,7 +89,6 @@ export const resolvers = {
             },
           });
         }
-        return storedBook;
       } else {
         throw new GraphQLError(`Not authorized to create book`);
       }
