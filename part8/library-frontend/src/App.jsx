@@ -4,9 +4,13 @@ import Books from "./components/Books";
 import NewBook from "./components/NewBook";
 import { Link, Route, Routes } from "react-router-dom";
 import Login from "./components/Login";
+import Recommendation from "./components/Recommendation";
+import { jwtDecode } from "jwt-decode";
 
 const App = () => {
-  const [user, setUser] = useState(localStorage.getItem("token"));
+  const token = localStorage.getItem("token");
+
+  const [user, setUser] = useState(jwtDecode(token).user);
 
   const logout = () => {
     setUser(null);
@@ -27,6 +31,9 @@ const App = () => {
             <Link to={"/new-book"}>
               <button>add book</button>
             </Link>
+            <Link to={"/recommendation"}>
+              <button>recommendation</button>
+            </Link>
             <button onClick={logout}>log out</button>
           </>
         ) : (
@@ -40,7 +47,13 @@ const App = () => {
         <Route path="/" element={<Authors />} />
         <Route path="/books" element={<Books />} />
         {user ? (
-          <Route path="/new-book" element={<NewBook />} />
+          <>
+            <Route path="/new-book" element={<NewBook />} />
+            <Route
+              path="/recommendation"
+              element={<Recommendation user={user} />}
+            />
+          </>
         ) : (
           <Route path="/login" element={<Login />} />
         )}
