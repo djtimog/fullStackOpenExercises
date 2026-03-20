@@ -4,6 +4,9 @@ import { GraphQLError } from "graphql";
 import { User } from "../models/user.js";
 import { PASSWORD, SECRET } from "../config.js";
 import jwt from "jsonwebtoken";
+import { PubSub } from "graphql-subscriptions";
+
+const pubsub = new PubSub();
 
 export const resolvers = {
   Query: {
@@ -79,6 +82,8 @@ export const resolvers = {
             born: 1,
             bookCount: 1,
           });
+
+          pubsub.publish("BOOK_ADDED", { bookAdded: storedBook });
           return storedBook;
         } catch (error) {
           throw new GraphQLError(`Saving book failed: ${error.message}`, {
@@ -151,6 +156,11 @@ export const resolvers = {
       const author = await Author.find({ name: root.name });
       const authorBooks = await Book.find({ author });
       return authorBooks.length;
+    },
+  },
+  Subscription: {
+    bookAdded: {
+      subscribe: () => pubsub.asyncIterableIterator("BOOK_ADDED"),
     },
   },
 };

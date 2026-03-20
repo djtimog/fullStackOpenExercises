@@ -5,6 +5,14 @@ import { typeDefs } from "./typeDefs.js";
 import jwt from "jsonwebtoken";
 import { SECRET } from "../config.js";
 import { User } from "../models/user.js";
+import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
+import { expressMiddleware } from "@as-integrations/express5";
+import cors from "cors";
+import express from "express";
+import { makeExecutableSchema } from "@graphql-tools/schema";
+import http from "http";
+import { WebSocketServer } from "ws";
+import { useServer } from "graphql-ws/use/ws";
 
 const getUserFromAuth = async (auth) => {
   if (!auth) {
@@ -19,22 +27,49 @@ const getUserFromAuth = async (auth) => {
   return await User.findOne({ username: decodedToken.user.username });
 };
 
-export const startServer = (port) => {
+export const startServer = async (port) => {
+  const app = express();
+  const httpServer = http.createServer(app);
+
+  const wsServer = new WebSocketServer({
+    server: httpServer,
+    path: "/",
+  });
+
+  const schema = makeExecutableSchema({ typeDefs, resolvers });
+  const serverCleanup = useServer({ schema }, wsServer);
+
   const server = new ApolloServer({
-    typeDefs,
-    resolvers,
-    introspection: true,
+    schema,
+    plugins: [
+      ApolloServerPluginDrainHttpServer({ httpServer }),
+      {
+        async serverWillStart() {
+          return {
+            async drainServer() {
+              await serverCleanup.dispose();
+            },
+          };
+        },
+      },
+    ],
   });
+  await server.start();
 
-  startStandaloneServer(server, {
-    listen: { port },
-    context: async ({ req, res }) => {
-      const auth = req.headers.authorization;
-      const currentUser = await getUserFromAuth(auth);
+  app.use(
+    "/",
+    cors(),
+    express.json(),
+    expressMiddleware(server, {
+      context: async ({ req }) => {
+        const auth = req.headers.authorization;
+        const currentUser = await getUserFromAuth(auth);
+        return { currentUser };
+      },
+    }),
+  );
 
-      return { currentUser };
-    },
-  }).then(({ url }) => {
-    console.log(`Server ready at ${url}`);
-  });
+  httpServer.listen(port, () =>
+    console.log(`Server is now running on http://localhost:${port}`),
+  );
 };
