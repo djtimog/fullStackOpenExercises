@@ -44,12 +44,13 @@ export const resolvers = {
           bookCount: 1,
         });
       }
-      return Book.find({}).populate("author", {
+      const book = await Book.find({}).populate("author", {
         name: 1,
         id: 1,
         born: 1,
         bookCount: 1,
       });
+      return book;
     },
     allAuthors: async () => Author.find({}),
     me: async (root, args, { currentUser }) => currentUser,
@@ -59,7 +60,11 @@ export const resolvers = {
       if (currentUser) {
         let authorExists = await Author.findOne({ name: args.author });
         if (!authorExists) {
-          const author = new Author({ name: args.author, born: null });
+          const author = new Author({
+            name: args.author,
+            born: null,
+            bookCount: 0,
+          });
           try {
             authorExists = await author.save();
           } catch (error) {
@@ -73,9 +78,10 @@ export const resolvers = {
           }
         }
         const book = new Book({ ...args, author: authorExists._id });
+        authorExists.bookCount++;
         try {
           const storedBook = await book.save();
-
+          await authorExists.save();
           await storedBook.populate("author", {
             name: 1,
             id: 1,
@@ -149,13 +155,6 @@ export const resolvers = {
       const token = jwt.sign({ user }, SECRET);
 
       return { value: token };
-    },
-  },
-  Author: {
-    bookCount: async (root) => {
-      const author = await Author.find({ name: root.name });
-      const authorBooks = await Book.find({ author });
-      return authorBooks.length;
     },
   },
   Subscription: {
